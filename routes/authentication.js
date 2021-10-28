@@ -6,6 +6,6 @@ Router.get('/discord', passport.authenticate('discord'));
 Router.get('/discord/callback', passport.authenticate('discord', {
     failureRedirect: '/error'
 }), function(req, res) {
-    res.redirect(`http://localhost:3000/auth/${req.user.user.userId}`) // Successful auth
+    res.redirect(`http://localhost:3000/auth/${req.user.user.discordId}`) // Successful auth
 });
 module.exports=Router;

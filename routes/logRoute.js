@@ -3,6 +3,13 @@ const Router = require('express').Router();
 const toggleIndex = ['all', 'sent', 'processing', 'cancelled']
 const { start, client } = require('../bot/botStart');
 const { logModel, status } = require('../dataBase/models/logModel');
+const getArray=collection=>{
+    let array=[];
+    collection.each(g=>{
+        array.push(g);
+    })
+    return array;
+}
 const getGuildByQuery = async (info, query, client) => {
     let item = [];
     if (!info) {
@@ -13,7 +20,7 @@ const getGuildByQuery = async (info, query, client) => {
             const e = info[i];
             try {
                 const guild = await client.guilds.fetch(e.targetGuild)
-                item.push({messageId:e.messageId, time:e.time,title:e.title,favourite:e.favourite,status:e.status, guildName: guild.name, guildAvatar: guild.iconURL(),messageType:e.type })
+                item.push({messageId:e.messageId,message:e.message,targetGuild:e.targetGuild,role:e.role,channels:e.channels,members:e.members, time:e.time,title:e.title,favourite:e.favourite,status:e.status, guildName: guild.name, guildAvatar: guild.iconURL(),messageType:e.type })
             } catch (error) {
 
             }
@@ -27,7 +34,7 @@ const getGuildByQuery = async (info, query, client) => {
             const guild = await client.guilds.fetch(e.targetGuild)
             const searchQuery = query.trim().toLowerCase();
             if (searchQuery === guild.name.slice(0, searchQuery.length).trim().toLowerCase()) {
-                item.push({messageId:e.messageId, time:e.time,title:e.title,favourite:e.favourite,status:e.status, guildName: guild.name, guildAvatar: guild.iconURL(),messageType:e.type })
+                item.push({messageId:e.messageId,message:e.message,targetGuild:e.targetGuild,role:e.role,channels:e.channels,members:e.members, time:e.time,title:e.title,favourite:e.favourite,status:e.status, guildName: guild.name, guildAvatar: guild.iconURL(),messageType:e.type })
             }
         } catch (error) {
 
@@ -39,11 +46,12 @@ Router.get('/searchinfo', async (req, res) => {
     const limit = parseInt(req.query.limit);
     const page = parseInt(req.query.page);
     const type = req.query.type;
+    const id = req.query.did;
     const startIndex = (page - 1) * limit;
     const endIndex = limit * page;
-    const id = req.query.did;
     const favourite = req.query.fav;
     const query = req.query.query?req.query.query.toString().trim():undefined;
+    console.log(limit,page,type,id);
     try {
         if (!client) await start();
         if (favourite === 'false') {
@@ -144,7 +152,7 @@ const getChannels=async(guild,id)=>{
     for (let i = 0; i < id.length; i++) {
         const e = id[i];
         let length=validChannels.length;
-        const channels=guild.channels.cache.array()
+        const channels=getArray(guild.channels.cache);
         for (let j = 0; j < channels.length; j++) {
             if (e===channels[j].id) {
                 validChannels.push(channels[j].name)

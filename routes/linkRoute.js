@@ -4,16 +4,16 @@ const Discord = require('discord.js');
 const {client,start}=require('../bot/botStart');
 
 Router.get('/info',async(req,res)=>{
-    const userId=req.query.did;
+    const discordId=req.query.did;
     const sessionId=req.query.sid;
     try {
-        const link=await LinkModel.findOne({userID:userId,entryID:sessionId})
+        const link=await LinkModel.findOne({discordId:discordId,entryId:sessionId})
         if(!link)
         {
             return res.sendStatus(404);
         }
         if(!client)await start();
-        const user=await client.users.fetch(userId)
+        const user=await client.users.fetch(discordId)
         const response={
             discordId:user.id,
             avatar:user.avatar,

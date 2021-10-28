@@ -17,16 +17,14 @@ Router.get('/',async(req,res)=>{
                 highestValue = currentValue;
                 lowestValue = currentValue;
             }
-            console.log(`currentvalue ${currentValue} highestValue ${highestValue} lowestValue ${lowestValue}`);
             if (info.length < count)
-                info.push({ name: g.guildName, avater: g.guildAvater, memberCount: g.guildMemberCount });
+                info.push({ name: g.guildName, avater: g.guildAvater, memberCount: g.guildMemberCount,isPartnerd:g.isPartnered });
             else if (info.length >= count && currentValue > lowestValue) {
                 info = info.filter(i => i.memberCount > lowestValue)
-                info.push({ name: g.guildName, avater: g.guildAvater, memberCount: g.guildMemberCount });
+                info.push({ name: g.guildName, avater: g.guildAvater, memberCount: g.guildMemberCount,isPartnerd:g.isPartnered });
             }
             if (currentValue > highestValue) highestValue = currentValue;
             if (currentValue < lowestValue) lowestValue = currentValue;
-w
         }
         res.status(200).json(info)
     } catch (error) {

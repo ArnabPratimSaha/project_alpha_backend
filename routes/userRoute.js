@@ -1,17 +1,12 @@
 const Router=require('express').Router();
-const getUser = require('../helperFunction/getUser');
+const {getUser} = require('../helperFunction/getUser');
+const { userModel } = require('../dataBase/models/userModel');
 
 Router.get('/info',async(req,res)=>{
-    const type=req.query.type;
-    const value=req.query.value;
+    const discordId=req.query.id;
     try {
-        const {error,response}=await getUser(value,type)
-        if(error)
-            throw error;
-        if(!response)
-        {
-            return res.sendStatus(404);
-        }
+        const response=await userModel.findOne({discordId:discordId})
+        if(!response)return res.sendStatus(404);
         const data={
             userName:response.userName,
             userTag:response.userTag,
