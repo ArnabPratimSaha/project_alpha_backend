@@ -118,7 +118,7 @@ Router.get('/validate', async (req, res) => {
             await LinkModel.findOneAndDelete({ discordId: did, entryId: entryId })
             return res.sendStatus(200);
         }
-        res.sendStatus(404);
+        res.sendStatus(400);
     } catch (error) {
         console.log(error);
     }
