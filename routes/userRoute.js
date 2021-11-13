@@ -3,9 +3,10 @@ const {getUser} = require('../helperFunction/getUser');
 const { userModel } = require('../dataBase/models/userModel');
 
 Router.get('/info',async(req,res)=>{
-    const discordId=req.query.id;
+    const discordId=req.query.did;
+    const userId=req.query.uid;
     try {
-        const response=await userModel.findOne({discordId:discordId})
+        const response=await userModel.findOne({discordId:discordId,userId:userId});
         if(!response)return res.sendStatus(404);
         const data={
             userName:response.userName,

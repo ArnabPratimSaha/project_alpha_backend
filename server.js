@@ -48,14 +48,12 @@ passport.use(new DiscordStrategy({
   async function (accessToken, refreshToken, profile, cb) {
     try {
       const response= await getUser(profile.id);
-      console.log(response);
       if(response)
       {
         return cb(null, { user: response });
       }
       else {
         const discordUser=await getUserFromDiscord(profile.id)
-        console.log('dadawd');
         const user = new userModel({
           userName: profile.username,
           userTag: profile.discriminator,

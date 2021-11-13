@@ -51,7 +51,6 @@ Router.get('/searchinfo', async (req, res) => {
     const endIndex = limit * page;
     const favourite = req.query.fav;
     const query = req.query.query?req.query.query.toString().trim():undefined;
-    console.log(limit,page,type,id);
     try {
         if (!client) await start();
         if (favourite === 'false') {
