@@ -3,9 +3,8 @@ const passport=require('passport');
 
 Router.get('/discord', passport.authenticate('discord'));
 Router.get('/discord/callback', passport.authenticate('discord', {
-    failureRedirect: '/fail'
+    failureRedirect: '/error'
 }), function(req, res) {
-    console.log(req.user)
-    res.redirect('/secretstuff') // Successful auth
+    res.redirect(`${process.env.FRONTENDURL}auth/${req.user.user.discordId}/${req.user.user.userId}`) // Successful auth
 });
 module.exports=Router;
