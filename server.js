@@ -71,7 +71,7 @@ passport.use(new DiscordStrategy({
     }
   }));
 
-const port = 5000 || process.env.PORT
+const port = process.env.PORT || 5000;
 
 
 
