@@ -28,6 +28,7 @@
     "dotenv": "^9.0.2",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
+    "heroku-client": "^3.1.0",
     "mongoose": "^5.13.9",
     "otp-generator": "^3.0.0",
     "passport": "^0.4.1",
