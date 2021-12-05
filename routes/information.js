@@ -15,6 +15,7 @@ Router.get('/',async(req,res)=>{
         let lowestValue=0;
         for (let i = 0; i < allGuilds.length; i++) {
             const g = allGuilds[i];
+            if(!g.status)continue;
             let currentValue = g.guildMemberCount;
             if (i === 0) {
                 highestValue = currentValue;
