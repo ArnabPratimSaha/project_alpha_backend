@@ -16,28 +16,21 @@ const getArray = collection => {
     return array;
 }
 Router.get('/permission', async (req, res) => {
-    const did = req.query.discordId;
+    const did = req.query.did;
     let roleGuilds = [];
     try {
-        if (!did) return res.sendStatus(404);
-        if (!client) await start();
-        const allData = await RoleModel.find({ guildStatus: true });
-        if (!allData) return res.status(200).json({ "guilds": roleGuilds });
-        for (let i = 0; i < allData.length; i++) {
-            const data = allData[i];
-            if (data.validMembers.includes(did)) {
-                const guild = await client.fetchGuildPreview(data.guildId);
-                if (guild) {
-                    roleGuilds.push({
-                        guildName: guild.name,
-                        guildId: guild.id,
-                        guildAvatar: guild.iconURL(),
-                        guildColor: randomColor()
-                    })
-                }
-            }
-        }
-        return res.status(200).json({ "guilds": roleGuilds })
+        if (!did) return res.sendStatus(400);
+        const guilds = await RoleModel.aggregate([
+            { $match: { guildStatus: true, validMembers: { '$in': [did] } } },
+            { $project: { _id: 0, guildId: '$guildId' } }
+        ]);
+        var id = new Array();
+        guilds.forEach(i => { id.push(i.guildId) });
+        const data = await GuildModel.aggregate([
+            { $match: { status: true, guildID: { '$in': id } } },
+            { $project: { _id: 0, guildName: '$guildName', guildId: '$guildID', guildAvatar: '$guildAvater', guildColor: randomColor() } }
+        ]);
+        return res.status(200).json({ "guilds": data })
     } catch (error) {
         console.log(error);
         return res.sendStatus(500)
@@ -46,37 +39,22 @@ Router.get('/permission', async (req, res) => {
 Router.get('/channel', async (req, res) => {
     const discordId = req.query.did;
     const guildId = req.query.gid;
-    const query = req.query.q;
     try {
         if (!client) await start();
         let validChannels = [];
         const guild = client.guilds.cache.find((e) => e.id === guildId)
         const channels = getArray(guild.channels.cache);
         if (channels) {
-            for (let i = 0; i < channels.length; i++) {
-                const channel = channels[i];
+            channels.forEach(channel => {
                 if (channel.type === 'GUILD_TEXT')//for text channels only
                 {
-                    if (query === undefined || query.length === 0) {
-                        if (validChannels.length <= 20) {
-                            validChannels.push({
-                                channelName: channel.name,
-                                channelId: channel.id,
-                                channelColor: randomColor()
-                            })
-                        }
-                    }
-                    else {
-                        if (channel.name.slice(0, query.length).toLocaleLowerCase() === query.toLocaleLowerCase()) {
-                            validChannels.push({
-                                channelName: channel.name,
-                                channelId: channel.id,
-                                channelColor: randomColor()
-                            })
-                        }
-                    }
+                    validChannels.push({
+                        channelName: channel.name,
+                        channelId: channel.id,
+                        channelColor: randomColor()
+                    });
                 }
-            }
+            })
         }
         res.status(200).json({ 'channels': validChannels })
     } catch (error) {
@@ -87,36 +65,20 @@ Router.get('/channel', async (req, res) => {
 Router.get('/role', async (req, res) => {
     const discordId = req.query.did;
     const guildId = req.query.gid;
-    const query = req.query.q;
     try {
         if (!client) await start();
         const guild = client.guilds.cache.find((e) => e.id === guildId)
         const roles = getArray(guild.roles.cache);
         let validRoles = [];
         if (roles) {
-            for (let i = 0; i < roles.length; i++) {
-                const role = roles[i];
-                if (query === undefined || query.length === 0) {
-                    if (validRoles.length <= 20) {
-                        validRoles.push({
-                            roleName: role.name,
-                            roleId: role.id,
-                            roleColor: role.hexColor,
-                            isAdmin: role.permissions.has('ADMINISTRATOR')
-                        })
-                    }
-                }
-                else {
-                    if (role.name.slice(0, query.length).toLocaleLowerCase() === query.toLocaleLowerCase()) {
-                        validRoles.push({
-                            roleName: role.name,
-                            roleId: role.id,
-                            roleColor: role.hexColor,
-                            isAdmin: role.permissions.has('ADMINISTRATOR')
-                        })
-                    }
-                }
-            }
+            roles.forEach(role => {
+                validRoles.push({
+                    roleName: role.name,
+                    roleId: role.id,
+                    roleColor: role.hexColor,
+                    isAdmin: role.permissions.has('ADMINISTRATOR')
+                })
+            })
         }
         res.status(200).json({ 'roles': validRoles })
     } catch (error) {
